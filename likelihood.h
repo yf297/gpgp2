@@ -1,9 +1,8 @@
-
 #include <omp.h>
 #include "linalg.h"
 #include "covfun.h"
   
-void copy_in(  double*   ysub, 
+ void copy_in(  double*   ysub, 
                double*   locsub,
                double*   y,
                double*   locs,
@@ -12,22 +11,19 @@ void copy_in(  double*   ysub,
                int       bsize,
                int       n,
                int       mb,
-               int       dim)
-{
+               int       dim){
     
-
-      for(int j = 0; j < bsize; ++j){
-        ysub[j] = y[ all_inds[first_ind + j] - 1  ];
-        for(int k=0; k< dim; ++k){
-          locsub[j + k*mb] = locs[all_inds[first_ind + j] - 1 + k*n];
-        }
+    for(int j = 0; j < bsize; ++j){
+      ysub[j] = y[ all_inds[first_ind + j] - 1  ];
+      for(int k=0; k< dim; ++k){
+        locsub[j + k*mb] = locs[all_inds[first_ind + j] - 1 + k*n];
       }
-      
-}
+    }  
+ }
   
   
 
-void vecchia_likelihood(  double*  ll, 
+ void vecchia_likelihood( double*  ll, 
                           double*  y, 
                           double*  locs,
                           int*     all_inds,

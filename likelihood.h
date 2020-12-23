@@ -2,7 +2,7 @@
 #include "linalg.h"
 #include "covfun.h"
   
- void copy_in(  double*   ysub, 
+ void copy_in( double*   ysub, 
                double*   locsub,
                double*   y,
                double*   locs,

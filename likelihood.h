@@ -87,4 +87,4 @@
     
     *ll = -0.5* ( n * log(2.0 * M_PI) + logdet + ySy);
     
-  }
+ }

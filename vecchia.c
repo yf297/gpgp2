@@ -1,8 +1,7 @@
 #include <omp.h>
-#include "util.h"
 #include "linalg.h"
 #include "covfun.h"
-  
+#include "util.h"
 
 void vecchia_likelihood(double*  ll,
                         double* covparms,
@@ -26,6 +25,7 @@ void vecchia_likelihood(double*  ll,
     double locsub[m*dim];
     double covmat[m*m];
 
+#pragma omp parallel for num_threads(ncores) private(covmat,ysub,locsub) reduction(+:ySy) reduction(+:logdet) schedule(static)
     for(int i = 0; i < n; ++i){
       
       int bsize = MIN(i+1, m);
@@ -133,16 +133,14 @@ void vecchia_Linv(double* Linv,
 
       one_vec[bsize-1] = 0.0;
 
-      copy_in_locsub(locsub, bsize, locs, n, dim, NNarray, i);
+      copy_in_locsub(locsub, bsize, locs, n, dim, NNarray, i*m);
       exponential_isotropic_mat(covmat, bsize, covparms, locsub, dim);
 
       chol(covmat, bsize);
       solve_l(covmat, one_vec, bsize);
 
       for(int j = bsize - 1; j>=0; --j){
-      
         Linv[i + (bsize-1-j)*n] = one_vec[j];
-        
       }
 
    }             

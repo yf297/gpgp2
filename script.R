@@ -83,9 +83,13 @@ y <- fast_Gp_sim(covparms[c(1,2,4)], "exponential_isotropic",locs,20)
 m = 30
 NNarray <- find_ordered_nn(locs, m)
 NNlist  <- group_obs(NNarray, 2)
-l1 <- vecchia_grouped_loglik_2(covparms, y, locs, NNlist, 1)
-l2 <- vecchia_grouped_meanzero_loglik(covparms, "exponential_isotropic", y, locs, NNlist)
+
+l1 <- vecchia_loglik_2(covparms, y, locs, NNarray, 4)
+l2 <- vecchia_grouped_loglik_2(covparms, y, locs, NNlist, 4)
+l3 <- vecchia_meanzero_loglik(covparms, "exponential_isotropic", y, locs, NNarray)
+l4 <- vecchia_grouped_meanzero_loglik(covparms, "exponential_isotropic", y, locs, NNlist)
 
 l1
+l3
 l2
-
+l4

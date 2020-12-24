@@ -1,22 +1,23 @@
- double distance(double*  locs, 
-                int      k, 
-                int      l, 
-                int     dim, 
-                int     lda){
+#include <math.h>
+
+double distance(double*  locsub, 
+                 int     k, 
+                 int     l, 
+                 int     dim, 
+                 int     bsize){
     
     double t = 0.0;
 
     for(int j = 0; j < dim; ++j){
-        t +=  pow(locs[k + j*lda] - locs[l + j*lda],2); 
+        t +=  pow(locsub[k + j*bsize] - locsub[l + j*bsize], 2); 
     }
     
     return( sqrt(t) );
- }
+}
+ 
 
-  
-  
- double exponential_isotropic(double*  covparms, 
-                               double   d){
+double exponential_isotropic(double*  covparms, 
+                             double   d){
     
     double nugget = covparms[0] * covparms[2];
     
@@ -25,22 +26,22 @@
     } else {
       return(covparms[0]*exp( -(d)/covparms[1] ));
     }
- }
-  
- void exponential_isotropic_mat(double*  covmat, 
-                                 double*  covparms, 
-                                 double*  locs, 
-                                 int      bsize,
-                                 int      dim,
-                                 int      mb){
+}
+ 
+
+void exponential_isotropic_mat(double*  covmat,
+                               int      bsize,
+                               double*  covparms, 
+                               double*  locsub,
+                               int      dim){
         
     for(int k = 0; k < bsize; ++k){
       for(int l = 0; l <= k; ++l){
-        double d = distance(locs, k, l, dim, mb);
+        double d = distance(locsub, k, l, dim, bsize);
         covmat[k*bsize + l] = exponential_isotropic(covparms, d);
         covmat[l*bsize + k] = covmat[k*bsize + l];
       }
     }
- }
+}
 
 

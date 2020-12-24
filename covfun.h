@@ -1,4 +1,6 @@
 #include <math.h>
+#include <omp.h>
+
 
 double distance(double*  locsub, 
                  int     k, 
@@ -36,10 +38,9 @@ void exponential_isotropic_mat(double*  covmat,
                                int      dim){
         
     for(int k = 0; k < bsize; ++k){
-      for(int l = 0; l <= k; ++l){
+      for(int l = k; l <= bsize; ++l){
         double d = distance(locsub, k, l, dim, bsize);
         covmat[k*bsize + l] = exponential_isotropic(covparms, d);
-        covmat[l*bsize + k] = covmat[k*bsize + l];
       }
     }
 }

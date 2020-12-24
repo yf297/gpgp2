@@ -5,7 +5,7 @@ source("likelihood.R")
 
 library(GpGp)
 
-gsize <- 300
+gsize <- 100
 nvec <- c(gsize,gsize)
 covparms <- c(variance = 4, range = 0.1, smoothness = 0.5, nugget = 0.1)
 x1 <- (1:nvec[1])/nvec[1]
@@ -20,8 +20,11 @@ NNlist  <- group_obs(NNarray, 2)
 mb <- get_mb(NNlist)
 
 l1 <- system.time(vecchia_loglik_2(covparms, y, locs, NNarray, 4))[[3]]
+
 l2 <- system.time(vecchia_grouped_loglik_2(covparms, y, locs, NNlist, mb, 4))[[3]]
+
 l3 <- system.time(vecchia_meanzero_loglik(covparms, "exponential_isotropic", y, locs, NNarray))[[3]]
+
 l4 <- system.time(vecchia_grouped_meanzero_loglik(covparms, "exponential_isotropic", y, locs, NNlist))[[3]]
 
 l1

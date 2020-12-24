@@ -3,16 +3,14 @@ vecchia_loglik_2 <- function(covparms, y, locs, NNarray, ncores){
   n <- length(y)
   m <- ncol(NNarray)
   dim <- ncol(locs)
-  
+  ll <- 0.0
 
-  ll = 0.0
-  ysub = rep(0,m)
   a <- .C("vecchia_likelihood",
-          ll = as.double(ll), 
+          ll = as.double(ll),
           as.double(covparms),
           as.double(y),
           as.integer(n),
-          as.double(locs), 
+          as.double(locs),
           as.integer(dim),
           as.integer(t(NNarray)),
           as.integer(m),

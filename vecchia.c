@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <omp.h>
 #include "linalg.h"
 #include "covfun.h"
@@ -5,12 +6,12 @@
 
 void vecchia_likelihood(double*  ll,
                         double*  covparms,
-                        double*  y, 
+                        double*  y,
                         int*     n_r,
                         double*  locs,
                         int*     dim_r,
                         int*     NNarray,
-                        int*     m_r, 
+                        int*     m_r,
                         int*     ncores_r){
     
     int n = *n_r;
@@ -31,6 +32,7 @@ void vecchia_likelihood(double*  ll,
       int bsize = MIN(i+1, m);
       
       copy_in(ysub,locsub, bsize, y, locs, n, dim, NNarray, i*m);
+      
       exponential_isotropic_mat(covmat, bsize, covparms, locsub, dim);
       
       chol(covmat, bsize);
@@ -39,8 +41,7 @@ void vecchia_likelihood(double*  ll,
       ySy += pow( ysub[(bsize-1)], 2);
       logdet += 2*log(covmat[(bsize-1)*bsize]);
     }
-    
-    *ll = -0.5* ( n * log(2.0 * M_PI) + logdet + ySy);
+    *ll = -0.5* (n * log(2.0 * M_PI) + logdet + ySy);
 
 }
 
@@ -72,7 +73,7 @@ void vecchia_grouped_likelihood(double*  ll,
     double ysub[mb];
     double locsub[dim*mb];
     double covmat[mb*mb];
-
+    
 #pragma omp parallel for num_threads(ncores) private(covmat,ysub,locsub) reduction(+:ySy) reduction(+:logdet) 
     for(int i = 0; i < nb; ++i){
       
@@ -91,10 +92,11 @@ void vecchia_grouped_likelihood(double*  ll,
       if(i == 0){ first_resp = 0; } else {first_resp = last_resp_of_block[i-1]+1-1; }
       last_resp = last_resp_of_block[i]-1;
       rsize = last_resp - first_resp + 1;
-      
+       
       copy_in(ysub,locsub, bsize, y, locs, n, dim, all_inds, first_ind);
       exponential_isotropic_mat(covmat, bsize, covparms, locsub, dim);
       
+
       chol(covmat, bsize);
       solve_l(covmat, ysub, bsize );
       
@@ -108,8 +110,7 @@ void vecchia_grouped_likelihood(double*  ll,
     }
     
     *ll = -0.5* ( n * log(2.0 * M_PI) + logdet + ySy);
-    
-  }
+}
 
 void vecchia_Linv(double* Linv,
                   double* covparms,

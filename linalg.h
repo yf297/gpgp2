@@ -1,4 +1,5 @@
 #include <R_ext/Lapack.h>
+#include <R_ext/BLAS.h>
 
 
   

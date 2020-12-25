@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <omp.h>
 #include "linalg.h"
 #include "covfun.h"
@@ -6,6 +7,7 @@
 
 void vecchia_likelihood(double*  ll,
                         double*  covparms,
+                        int*     nparms_r,
                         double*  y,
                         int*     n_r,
                         double*  locs,
@@ -18,22 +20,28 @@ void vecchia_likelihood(double*  ll,
     int m = *m_r;
     int dim = *dim_r;
     int ncores = *ncores_r;
+    int nparms = *nparms_r;
     
     double ySy = 0.0;
     double logdet = 0.0;
     
-    double ysub[m];
-    double locsub[m*dim];
-    double covmat[m*m];
+#pragma omp parallel num_threads(1) 
+{
+  double* ysub     = (double*) malloc(m*sizeof(double) );
+  double* locsub   = (double*) malloc(m*dim*sizeof(double));
+  double* covmat   = (double*) malloc(m*m*sizeof(double));
+  double* dcovmat  = (double*) malloc(m*m*nparms*sizeof(double));
 
-#pragma omp parallel for num_threads(ncores) private(covmat,ysub,locsub) reduction(+:ySy) reduction(+:logdet)
+#pragma omp for reduction(+:ySy) reduction(+:logdet)
     for(int i = 0; i < n; ++i){
       
       int bsize = MIN(i+1, m);
       
-      copy_in(ysub,locsub, bsize, y, locs, n, dim, NNarray, i*m);
+      copy_in_ungrouped(ysub,locsub, bsize, y, locs, n, dim, NNarray, i*m);
       
-      exponential_isotropic_mat(covmat, bsize, covparms, locsub, dim);
+      exponential_isotropic(covmat, bsize, covparms, locsub, dim);
+      
+      d_exponential_isotropic(dcovmat, bsize, covparms, nparms, locsub, dim);
       
       chol(covmat, bsize);
       solve_l(covmat, ysub, bsize);
@@ -41,6 +49,8 @@ void vecchia_likelihood(double*  ll,
       ySy += pow( ysub[(bsize-1)], 2);
       logdet += 2*log(covmat[(bsize-1)*bsize]);
     }
+    
+}
     *ll = -0.5* (n * log(2.0 * M_PI) + logdet + ySy);
 
 }
@@ -93,8 +103,8 @@ void vecchia_grouped_likelihood(double*  ll,
       last_resp = last_resp_of_block[i]-1;
       rsize = last_resp - first_resp + 1;
        
-      copy_in(ysub,locsub, bsize, y, locs, n, dim, all_inds, first_ind);
-      exponential_isotropic_mat(covmat, bsize, covparms, locsub, dim);
+      copy_in_grouped(ysub,locsub, bsize, y, locs, n, dim, all_inds, first_ind);
+      exponential_isotropic(covmat, bsize, covparms, locsub, dim);
       
 
       chol(covmat, bsize);
@@ -133,7 +143,7 @@ void vecchia_Linv(double* Linv,
       one_vec[bsize-1] = 0.0;
 
       copy_in_locsub(locsub, bsize, locs, n, dim, NNarray, i*m);
-      exponential_isotropic_mat(covmat, bsize, covparms, locsub, dim);
+      exponential_isotropic(covmat, bsize, covparms, locsub, dim);
 
       chol(covmat, bsize);
       solve_l(covmat, one_vec, bsize);

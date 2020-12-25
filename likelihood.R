@@ -4,10 +4,12 @@ vecchia_loglik_2 <- function(covparms, y, locs, NNarray, ncores){
   m <- ncol(NNarray)
   dim <- ncol(locs)
   ll <- 0.0
-
+  nparms <- length(covparms)
+  
   a <- .C("vecchia_likelihood",
           ll = as.double(ll),
           as.double(covparms),
+          as.integer(nparms),
           as.double(y),
           as.integer(n),
           as.double(locs),
@@ -22,7 +24,6 @@ vecchia_loglik_2 <- function(covparms, y, locs, NNarray, ncores){
 
 
 vecchia_grouped_loglik_2 <- function(covparms, y, locs, NNlist, mb, ncores){
-  
   
   all_inds <- as.vector(NNlist[[1]])
   last_ind_of_block <- as.vector(NNlist[[2]])
@@ -70,5 +71,4 @@ get_mb <- function(NNlist){
   
   return(mb)
 }
-
 

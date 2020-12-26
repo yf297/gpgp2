@@ -1,4 +1,3 @@
-setwd("~/Desktop/GpGp2")
 system("rm vecchia.o vecchia.so")
 system("R CMD SHLIB vecchia.c")
 dyn.load("vecchia.so")

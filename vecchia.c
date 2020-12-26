@@ -20,17 +20,15 @@ void vecchia_likelihood(double*  ll,
     int m = *m_r;
     int dim = *dim_r;
     int ncores = *ncores_r;
-    int nparms = *nparms_r;
     
     double ySy = 0.0;
     double logdet = 0.0;
     
-#pragma omp parallel num_threads(1) 
+#pragma omp parallel num_threads(ncores) 
 {
   double* ysub     = (double*) malloc(m*sizeof(double) );
   double* locsub   = (double*) malloc(m*dim*sizeof(double));
   double* covmat   = (double*) malloc(m*m*sizeof(double));
-  double* dcovmat  = (double*) malloc(m*m*nparms*sizeof(double));
 
 #pragma omp for reduction(+:ySy) reduction(+:logdet)
     for(int i = 0; i < n; ++i){
@@ -41,13 +39,14 @@ void vecchia_likelihood(double*  ll,
       
       exponential_isotropic(covmat, bsize, covparms, locsub, dim);
       
-      d_exponential_isotropic(dcovmat, bsize, covparms, nparms, locsub, dim);
-      
       chol(covmat, bsize);
+      
       solve_l(covmat, ysub, bsize);
       
-      ySy += pow( ysub[(bsize-1)], 2);
-      logdet += 2*log(covmat[(bsize-1)*bsize]);
+      int ii = (bsize*(bsize +1))/2;
+      
+       ySy += pow( ysub[(bsize-1)], 2);
+       logdet += 2*log(covmat[ii-1]);
     }
     
 }
@@ -106,21 +105,26 @@ void vecchia_grouped_likelihood(double*  ll,
       copy_in_grouped(ysub,locsub, bsize, y, locs, n, dim, all_inds, first_ind);
       exponential_isotropic(covmat, bsize, covparms, locsub, dim);
       
-
       chol(covmat, bsize);
       solve_l(covmat, ysub, bsize );
       
       int wr;
+      int ii;
+      
       for(int j = 0; j < rsize; ++j){
+      ii = 0;
         wr  =  local_resp_inds[first_resp + j] - 1;
-        logdet += 2.0*log( covmat[ wr * bsize ] ) ; 
+        for(int s = 0; s < wr; ++s){
+          ii += (bsize - s);
+        }
+        logdet += 2.0*log( covmat[ ii ] ) ; 
         ySy +=  pow( ysub[wr], 2);
       }
-      
     }
     
     *ll = -0.5* ( n * log(2.0 * M_PI) + logdet + ySy);
 }
+
 
 void vecchia_Linv(double* Linv,
                   double* covparms,
@@ -151,7 +155,5 @@ void vecchia_Linv(double* Linv,
       for(int j = bsize - 1; j>=0; --j){
         Linv[i + (bsize-1-j)*n] = one_vec[j];
       }
-
    }             
-    
 }  

@@ -15,19 +15,30 @@ double distance(double*  locsub,
     return( sqrt(t) );
 }
  
+double ei(double*  covparms, 
+          double   d){
+   
+   double nugget = covparms[0] * covparms[2];
+   
+   if(d == 0.0){
+     return(covparms[0] + nugget);
+   } else {
+     return(covparms[0]*exp( -(d)/covparms[1] ));
+   }
+ }
  
 void exponential_isotropic(double*  covmat,
                            int      bsize,
                            double*  covparms, 
                            double*  locsub,
                            int      dim){
-
+  int ii = 0;
   for(int k = 0; k < bsize; ++k){
-    covmat[k*bsize + k] = covparms[0]*(1 + covparms[2]);
-    for(int l = (k+1); l <= bsize; ++l){
+    for(int l = k; l < bsize; ++l){
       double d = distance(locsub, k, l, dim, bsize);
-      covmat[k*bsize + l] = covparms[0]*exp( -(d)/covparms[1] );
+      covmat[ii + l] = ei(covparms,d);
     }
+    ii += (bsize - (k+1));
   }
 }
 
@@ -41,7 +52,7 @@ void d_exponential_isotropic(double*  dcovmat,
   
   for(int k = 0; k < bsize; ++k){
     for(int l = 0; l <= bsize; ++l){
-      double d = distance(locsub, k, l, dim, bsize);
+      double d = 0;
        dcovmat[0*bsize*bsize + k*bsize + l] += exp( -(d));
        dcovmat[1*bsize*bsize + k*bsize + l] += covparms[0]*exp( -(d)/covparms[1]) ;
        if(k ==l){

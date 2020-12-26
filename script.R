@@ -6,9 +6,8 @@ source("likelihood.R")
 
 library(GpGp)
 
-gsize <- 100
+gsize <- 300
 nvec <- c(gsize,gsize)
-n  <- gsize*gsize
 x1 <- (1:nvec[1])/nvec[1]
 x2 <- (1:nvec[2])/nvec[2]
 locs <- as.matrix(expand.grid(x1,x2))

@@ -24,11 +24,12 @@ void vecchia_likelihood(double*  ll,
     double ySy = 0.0;
     double logdet = 0.0;
     
+    int mb = m*(m+1)/2;
 #pragma omp parallel num_threads(ncores) 
 {
   double* ysub     = (double*) malloc(m*sizeof(double) );
   double* locsub   = (double*) malloc(m*dim*sizeof(double));
-  double* covmat   = (double*) malloc(m*m*sizeof(double));
+  double* covmat   = (double*) malloc(mb*sizeof(double));
 
 #pragma omp for reduction(+:ySy) reduction(+:logdet)
     for(int i = 0; i < n; ++i){

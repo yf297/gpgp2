@@ -43,27 +43,3 @@ void exponential_isotropic(double*  covmat,
 }
 
 
-void d_exponential_isotropic(double*  dcovmat,
-                             int      bsize,
-                             double*  covparms, 
-                             int      nparms,
-                             double*  locsub,
-                             int      dim){
-  
-  for(int k = 0; k < bsize; ++k){
-    for(int l = 0; l <= bsize; ++l){
-      double d = 0;
-       dcovmat[0*bsize*bsize + k*bsize + l] += exp( -(d));
-       dcovmat[1*bsize*bsize + k*bsize + l] += covparms[0]*exp( -(d)/covparms[1]) ;
-       if(k ==l){
-         dcovmat[0*bsize*bsize + k*bsize + l] += covparms[2];
-         dcovmat[2*bsize*bsize + k*bsize + l] += covparms[0];
-       }else{
-         for(int j = 0; j < nparms; ++j){
-           dcovmat[j*bsize*bsize + l*bsize + k] =dcovmat[j*bsize*bsize + k*bsize + l];
-         }
-       }
-      }
-    }
-}
-

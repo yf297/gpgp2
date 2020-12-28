@@ -1,5 +1,4 @@
-system("R CMD SHLIB vecchia.c")
-dyn.load("vecchia.so")
+dyn.load("vecchia")
 
 vecchia_loglik_2 <- function(covparms, y, locs, NNarray, ncores){
   

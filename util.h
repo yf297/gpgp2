@@ -4,11 +4,11 @@
   _a < _b ? _a : _b; })     \
   
 
-void copy_in_ungrouped(double*   ysub,
-                       double*   locsub,
+void copy_in_ungrouped(double* restrict  ysub,
+                       double* restrict  locsub,
                        int       bsize,
-                       double*   y,
-                       double*   locs,
+                       double* restrict   y,
+                       double* restrict  locs,
                        int       n,
                        int       dim,
                        int*      inds,
@@ -30,15 +30,15 @@ void copy_in_ungrouped(double*   ysub,
   
 }
 
-void copy_in_grouped(double*   ysub,
-             double*   locsub,
-             int       bsize,
-             double*   y,
-             double*   locs,
-             int       n,
-             int       dim,
-             int*      inds,
-             int       first_ind){
+void copy_in_grouped(double* restrict   ysub,
+                     double* restrict  locsub,
+                     int       bsize,
+                     double* restrict  y,
+                     double* restrict  locs,
+                     int       n,
+                     int       dim,
+                     int*      inds,
+                     int       first_ind){
   
   int ii;
   

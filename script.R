@@ -1,11 +1,7 @@
-system("rm vecchia.o vecchia.so")
-system("R CMD SHLIB vecchia.c")
-dyn.load("vecchia.so")
 source("likelihood.R")
-
 library(GpGp)
 
-gsize <- 300
+gsize <- 30
 nvec <- c(gsize,gsize)
 x1 <- (1:nvec[1])/nvec[1]
 x2 <- (1:nvec[2])/nvec[2]

@@ -1,3 +1,6 @@
+system("R CMD SHLIB vecchia.c")
+dyn.load("vecchia.so")
+
 vecchia_loglik_2 <- function(covparms, y, locs, NNarray, ncores){
   
   n <- length(y)

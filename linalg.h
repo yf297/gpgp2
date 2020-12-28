@@ -1,14 +1,12 @@
-#include <R_ext/Lapack.h>
-#include <R_ext/BLAS.h>
-
-
+#include <cblas-openblas.h>
+#include <lapacke.h>
   
 void chol(double*  a, 
           int      n){
   
     int info;
     
-    F77_CALL(dpptrf)("L", &n, a, &info);
+   LAPACKE_dpptrf(LAPACK_COL_MAJOR,'L', n, a);
     
 }
   
@@ -22,6 +20,7 @@ void solve_l(double*  a,
     int colb[1];
     colb[0] = 1;
     
-    F77_CALL(dtptrs)("L", "N", "N", &n, colb, a, b, &n, &info);
+    LAPACKE_dtptrs(LAPACK_COL_MAJOR,'L', 'N', 'N', n, 1, a, b, n);
+
 }
  

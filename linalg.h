@@ -1,4 +1,4 @@
-#include <cblas-openblas.h>
+//#include <cblas-openblas.h>
 #include <lapacke.h>
   
 void chol(double* restrict a, 

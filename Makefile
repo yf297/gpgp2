@@ -1,18 +1,18 @@
 CC = gcc
 LD = gcc
-CFLAGS = -fopenmp -O3
-LDFLAGS = -fopenmp -shared  -llapacke 
+CFLAGS = -O3 -fopenmp   
+LDFLAGS = -fopenmp -llapacke -lm 
 
-OBJFILES = vecchia.o
-SHARED = vecchia
+OBJFILES = time.o
+MAIN = time
 
-all: $(SHARED)
+all: $(MAIN)
 
-$(SHARED): $(OBJFILES)
-	$(LD) -o $(SHARED) $(OBJFILES) $(LDFLAGS)
+$(MAIN): $(OBJFILE)
+	$(LD) -o $(OBJFILE) $(LDFLAGS)
 
 %.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) -c -o $@ $< $(CFLAGS) 
 
 clean:
 	rm -f $(OBJFILES) $(SHARED)

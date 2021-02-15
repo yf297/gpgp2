@@ -1,47 +1,41 @@
-#include <stdio.h>
+#ifndef VECCHIA_H
+#define VECCHIA_H
+
 #include <stdlib.h>
 #include <omp.h>
 #include "linalg.h"
 #include "covfun.h"
-#include "util.h"
+#include "copy_in.h"
 
 void vecchia_likelihood(double*  ll,
                         double*  covparms,
-                        int*     nparms_r,
                         double*  y,
-                        int*     n_r,
+                        int      n,
                         double*  locs,
-                        int*     dim_r,
+                        int      dim,
                         int*     NNarray,
-                        int*     m_r,
-                        int*     ncores_r){
+                        int      m,
+                        int      ncores){
 
 
-    double t1,t2,t3,t4,t5;
-
-
-    int n = *n_r;
-    int m = *m_r;
-    int dim = *dim_r;
-    int ncores = *ncores_r;
     
     double ySy = 0.0;
     double logdet = 0.0;
     
     int mb = m*(m+1)/2;
-#pragma omp parallel num_threads(ncores) 
+//#pragma omp parallel num_threads(ncores) 
 {
 
   double* ysub     = (double*) malloc(m*sizeof(double) );
   double* locsub   = (double*) malloc(m*dim*sizeof(double));
   double* covmat   = (double*) malloc(mb*sizeof(double));
 
-#pragma omp for reduction(+:ySy) reduction(+:logdet) schedule(static)
+//#pragma omp for reduction(+:ySy) reduction(+:logdet) schedule(static)
     for(int i = 0; i < n; ++i){
       
       int bsize = MIN(i+1, m);
       
-      copy_in_ungrouped(ysub,locsub, bsize, y, locs, n, dim, NNarray, i*m);
+      copy_in(ysub, locsub, bsize, y, locs, n, dim, NNarray, i*m);
       
       exponential_isotropic(covmat, bsize, covparms, locsub, dim);
 
@@ -64,30 +58,23 @@ void vecchia_likelihood(double*  ll,
 
 
 
-void vecchia_grouped_likelihood(double*  ll,
+void vecchia_grouped_likelihood(double  ll,
                                 double*  covparms,
                                 double*  y,
-                                int*     n_r,
+                                int      n,
                                 double*  locs,
-                                int*     dim_r,
+                                int      dim,
                                 int*     all_inds,
                                 int*     last_ind_of_block,
                                 int*     last_resp_of_block,
                                 int*     local_resp_inds,
-                                int*     nb_r,
-                                int*     mb_r,
-                                int*     ncores_r){
-    int n = *n_r;
-    int nb = *nb_r;
-    int mb = *mb_r;
-    int dim = *dim_r;
-    int ncores = *ncores_r;
+                                int      nb,
+                                int      mb,
+                                int      ncores){
     
     double ySy = 0.0;
     double logdet = 0.0;
     
-
-
 #pragma omp parallel num_threads(ncores)
 {
 
@@ -137,10 +124,10 @@ void vecchia_grouped_likelihood(double*  ll,
         ySy +=  pow( ysub[wr], 2);
       }
     }
-    
-
+  
 }    
 
     *ll = -0.5* ( n * log(2.0 * M_PI) + logdet + ySy);
 }
 
+#endif

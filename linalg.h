@@ -1,4 +1,6 @@
-//#include <cblas-openblas.h>
+#ifndef LINALG_H
+#define LINALG_H
+
 #include <lapacke.h>
   
 void chol(double* restrict a, 
@@ -19,3 +21,4 @@ void solve_l(double* restrict  a,
 
 }
  
+#endif

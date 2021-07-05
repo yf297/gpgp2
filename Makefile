@@ -1,18 +1,17 @@
 CC = gcc
+CC2 = g++
 LD = gcc
-CFLAGS = -O3 -fopenmp   
-LDFLAGS = -fopenmp -llapacke -lm 
+LD2 = g++
+CFLAGS = -O2 -fopenmp -fPIC 
+LDFLAGS = -fopenmp -llapacke -llapack -lblas -lm -lquadmath
+all = time
+all: $(all)
 
-OBJFILES = time.o
-MAIN = time
+time: time.o
+	$(LD) -o time time.o $(LDFLAGS) -pg
 
-all: $(MAIN)
-
-$(MAIN): $(OBJFILE)
-	$(LD) -o $(OBJFILE) $(LDFLAGS)
-
-%.o: %.c
-	$(CC) -c -o $@ $< $(CFLAGS) 
+time.o: time.c
+	$(CC) -c -o time.o time.c $(CFLAGS) -pg
 
 clean:
-	rm -f $(OBJFILES) $(SHARED)
+	rm -f *.o time

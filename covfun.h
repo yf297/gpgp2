@@ -10,8 +10,7 @@ double distance(double*  locsub,
     
     double t = 0.0;
     for(int j = 0; j < dim; ++j){
-        // could just use pow(...,2) below
-        t +=  ((locsub[k*dim + j] - locsub[l*dim + j]) * (locsub[k*dim + j] - locsub[l*dim + j])) ; 
+        t += ((locsub[k*dim + j] - locsub[l*dim + j]) * (locsub[k*dim + j] - locsub[l*dim + j])) ; 
     }
 
     t = sqrt(t);
@@ -39,14 +38,16 @@ void exponential_isotropic(double*  covmat,
   double c1 = covparms[1];
   double c2 = covparms[2];
 	
-  int ii = 0;
   for(int k = 0; k < bsize; ++k){
-    covmat[ii + k] = c0*(1 + c2);
+    covmat[k*bsize + k] = c0*(1 + c2);
     for(int l = (k+1); l < bsize; ++l){
-      double d = distance(locsub, k, l, dim, bsize);
-      covmat[ii + l] = c0*exp(-d/c1);
+     double d = 0.0;
+      for(int j = 0; j < dim; ++j){
+        d += ((locsub[k*dim + j] - locsub[l*dim + j]) * (locsub[k*dim + j] - locsub[l*dim + j])) ; 
+      }
+      d = sqrt(d);
+      covmat[k*bsize + l] = c0*exp(-d/c1);
     }
-    ii += (bsize - (k+1));
   }
 }
 

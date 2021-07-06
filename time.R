@@ -9,7 +9,7 @@ source("~/GpGp/R/fit_model.R")
 source("~/GpGp/R/simulation_functions.R")
 source("R/nn_function.R")
 
-gsize <- 50
+gsize <- 100
 nvec <- c(gsize,gsize)
 n <- gsize*gsize
 x1 <- (1:nvec[1])/nvec[1]
@@ -17,13 +17,16 @@ x2 <- (1:nvec[2])/nvec[2]
 locs <- as.matrix(expand.grid(x1,x2))
 write.table(as.vector(locs), "data/locs.txt", row.names = F, col.names = F)
 X <- cbind(rep(1,n),locs)
+write.table(as.vector(X), "data/X.txt", row.names = F, col.names = F)
+
+
 covparms <- c(variance = 4, range = 0.1, smoothness = 0.5, nugget = 0.1)
 
 print("simulating data...")
 y <- fast_Gp_sim(covparms[c(1,2,4)], "exponential_isotropic",locs,20)
 write.table(y,"data/y.txt", row.names = F, col.names = F)
 
-m <- 10
+m <- 30
 
 print("finding nearest neighbors...")
 NNarray <- find_ordered_nn_brute(locs, m)

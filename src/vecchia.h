@@ -26,14 +26,14 @@ void vecchia_likelihood(double*  ll,
 
     
   double ySy = 0.0;
-  double logdet = 0.0;
-      
+  double logdet = 0.0;    
+
 #pragma omp parallel
 {
-  double* ysub   = (double*) malloc(m*sizeof(double) );
-  double* locsub = (double*) malloc(m*dim*sizeof(double));
-  double* Xsub   = (double*) malloc(m*p*sizeof(double));
-  double* covmat = (double*) malloc(m*m*sizeof(double));
+  double* ysub    = (double*) malloc(m*sizeof(double));
+  double* locsub  = (double*) malloc(m*dim*sizeof(double));
+  double* Xsub    = (double*) malloc(m*p*sizeof(double));
+  double* covmat  = (double*) malloc(m*m*sizeof(double));
 
 #pragma omp for reduction(+:ySy) reduction(+:logdet)
     for(int i = 0; i < n; ++i){
@@ -44,12 +44,20 @@ void vecchia_likelihood(double*  ll,
       exponential_isotropic(covmat, bsize, covparms, locsub, dim);
 
       chol(covmat, bsize);
-//      double* Li = (double*) malloc(bsize*sizeof(double));
-//      Li[bsize-1] = 1.0;
+      
+      double* LiX = (double*) malloc(bsize*sizeof(double));
+      double* Liy = (double*) malloc(bsize*sizeof(double));
+      LiX[bsize-1] = 1.0;
+      Liy[bsize-1] = 1.0;
+      solve_t(covmat, LiX, bsize);
+      solve_t(covmat, Liy, bsize);
 
-      //solve_t(covmat, Li, bsize);
+      solve_t(Xsub, LiX, bsize);
+//      outer(LiX, LiX, XSX);
+//      scale(LiX, Liy, XSy);
+      
+      
       solve(covmat, ysub, bsize);
-            
       int ii = (bsize-1)*(bsize) + (bsize-1);      
       ySy += pow( ysub[(bsize-1)], 2);
       logdet += 2*log(covmat[ii]);
@@ -61,7 +69,6 @@ void vecchia_likelihood(double*  ll,
     free(covmat);
 }
     *ll = -0.5* (n * log(2.0 * M_PI) + logdet + ySy);
-
 }
 
 

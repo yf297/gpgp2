@@ -11,11 +11,12 @@ source("nn_function.R")
 
 gsize <- 100
 nvec <- c(gsize,gsize)
+n <- gsize*gsize
 x1 <- (1:nvec[1])/nvec[1]
 x2 <- (1:nvec[2])/nvec[2]
 locs <- as.matrix(expand.grid(x1,x2))
 write.table(as.vector(locs), "data/locs.txt", row.names = F, col.names = F)
-
+X <- cbind(rep(1,n),locs)
 covparms <- c(variance = 4, range = 0.1, smoothness = 0.5, nugget = 0.1)
 
 print("simulating data...")
@@ -32,10 +33,7 @@ write.table(as.vector(t(NNarray2)),"data/NNarray.txt", row.names = F, col.names 
 
 #print("Computing likelihoods...")
 t1 = Sys.time()
-l <- system.time(c <- vecchia_meanzero_loglik(covparms, "exponential_isotropic", y, locs, NNarray))
+vecchia_meanzero_loglik(covparms, "exponential_isotropic", y, locs, NNarray)
+#vecchia_profbeta_loglik_grad_info(covparms, "exponential_isotropic", y, X, locs, NNarray)
 t2 = Sys.time()
 t2-t1
-l
-c
-#l1 <- system.time(exponential_isotropic(covparms, locs[1:31,]))
-#l1

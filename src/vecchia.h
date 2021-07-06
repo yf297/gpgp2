@@ -14,8 +14,10 @@
 void vecchia_likelihood(double*  ll,
                         double*  covparms,
                         double*  y,
-                        int      n,
                         double*  locs,
+                        double*  X,
+                        int      n,
+                        int      p,
                         int      dim,
                         int*     NNarray,
                         int      m,
@@ -26,41 +28,41 @@ void vecchia_likelihood(double*  ll,
   double ySy = 0.0;
   double logdet = 0.0;
       
-  int mb = m*(m+1)/2;
 #pragma omp parallel
 {
-  double ysub[81];    // = (double*) malloc(m*sizeof(double) );
-  double locsub[81*2];  // = (double*) malloc(m*dim*sizeof(double));
-  double covmat[81*81]; //  = (double*) malloc(mb*sizeof(double));
+  double* ysub   = (double*) malloc(m*sizeof(double) );
+  double* locsub = (double*) malloc(m*dim*sizeof(double));
+  double* Xsub   = (double*) malloc(m*p*sizeof(double));
+  double* covmat = (double*) malloc(m*m*sizeof(double));
 
 #pragma omp for reduction(+:ySy) reduction(+:logdet)
     for(int i = 0; i < n; ++i){
       
       int bsize = MIN(i+1, m);
       
-     // copy_in(ysub, locsub, bsize, y, locs, n, dim, NNarray, i*m);
-      for(int j = 0; j < bsize; ++j){
-        int in = NNarray[i*m + j];
-        ysub[j] = y[in - 1];
-        for(int k = 0; k < dim; ++k){
-          locsub[j*dim + k]  = locs[(in-1) + k*n];
-        }
-      } 
-      
+      copy_in(ysub, locsub, Xsub, bsize, y, locs, X, n, dim, p, NNarray, i*m);
       exponential_isotropic(covmat, bsize, covparms, locsub, dim);
 
       chol(covmat, bsize);
+      double* Li = (double*) malloc(bsize*sizeof(double));
+      Li[bsize-1] = 1.0;
 
-      solve_l(covmat, ysub, bsize);
-
-      int ii = (bsize-1)*(bsize) + bsize-1;
+      solve_t(covmat, Li, bsize);
+      solve(covmat, ysub, bsize);
       
+      
+      int ii = (bsize-1)*(bsize) + bsize-1;      
       ySy += pow( ysub[(bsize-1)], 2);
       logdet += 2*log(covmat[ii]);
     }
-    
+
+    free(ysub);
+    free(locsub);
+    free(Xsub);
+    free(covmat);
 }
     *ll = -0.5* (n * log(2.0 * M_PI) + logdet + ySy);
+
 }
 
 

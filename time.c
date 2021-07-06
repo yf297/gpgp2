@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "vecchia.h"
+#include "src/vecchia.h"
 #include <omp.h>
 
 int main(){
@@ -15,7 +15,7 @@ int main(){
     double y[100*100];
     double locs[100*100*2];
     int NNarray[100*100*81];
-    
+    double X[100*100*3];   
 
     for(int  i = 0; i < (100*100); ++i){
       fscanf(obs, "%lf", &y[i]);
@@ -39,6 +39,7 @@ int main(){
     double covparms[4] = {4,0.1,0.5,0.1};
     int n = 100*100;
     int dim  = 2;
+    int p = 3;
     int m = 81;
     int n_cores = 4;
    
@@ -48,9 +49,11 @@ int main(){
     vecchia_likelihood(&ll,
 		       covparms, 
 		       y,
+               locs,
+               X,
 		       n,
-		       locs,
 		       dim,
+		       p,
 		       NNarray,
 		       m,
 		       n_cores);

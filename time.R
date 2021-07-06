@@ -7,9 +7,9 @@ source("~/GpGp/R/nearest_neighbor_functions.R")
 source("~/GpGp/R/ordering_functions.R")
 source("~/GpGp/R/fit_model.R")
 source("~/GpGp/R/simulation_functions.R")
-source("nn_function.R")
+source("R/nn_function.R")
 
-gsize <- 100
+gsize <- 50
 nvec <- c(gsize,gsize)
 n <- gsize*gsize
 x1 <- (1:nvec[1])/nvec[1]
@@ -23,7 +23,7 @@ print("simulating data...")
 y <- fast_Gp_sim(covparms[c(1,2,4)], "exponential_isotropic",locs,20)
 write.table(y,"data/y.txt", row.names = F, col.names = F)
 
-m <- 80
+m <- 10
 
 print("finding nearest neighbors...")
 NNarray <- find_ordered_nn_brute(locs, m)
@@ -31,9 +31,8 @@ NNarray2 <- find_ordered_nn_brute2(locs, m)
 NNarray2[is.na(NNarray2)] = 0
 write.table(as.vector(t(NNarray2)),"data/NNarray.txt", row.names = F, col.names = F)
 
-#print("Computing likelihoods...")
+print("Computing likelihoods...")
 t1 = Sys.time()
 vecchia_meanzero_loglik(covparms, "exponential_isotropic", y, locs, NNarray)
-#vecchia_profbeta_loglik_grad_info(covparms, "exponential_isotropic", y, X, locs, NNarray)
 t2 = Sys.time()
 t2-t1

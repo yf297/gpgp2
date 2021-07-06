@@ -2,7 +2,7 @@
 #include "src/vecchia.h"
 #include <omp.h>
 
-int main(){
+int main(int argc, char** argv){
 
     FILE *obs;
     FILE *nn;
@@ -12,20 +12,28 @@ int main(){
     nn   = fopen("data/NNarray.txt", "r");
     l    = fopen("data/locs.txt", "r");
 
-    double y[100*100];
-    double locs[100*100*2];
-    int NNarray[100*100*81];
-    double X[100*100*3];   
+    char* a = argv[1];
+    char* b = argv[2];
 
-    for(int  i = 0; i < (100*100); ++i){
+    int n = atoi(a)*atoi(a);
+    int m = atoi(b)+1;
+    int p = 3;
+    int dim = 2;
+
+    double* y    = (double*) malloc(n*sizeof(double));
+    double* locs = (double*) malloc(n*dim*sizeof(double));
+    int* NNarray = (int*) malloc(n*m*sizeof(int));
+    double* X    = (double*) malloc(n*p*sizeof(double));
+
+    for(int  i = 0; i < n; ++i){
       fscanf(obs, "%lf", &y[i]);
     } 
 
-    for(int i = 0; i < (100*100*2); ++i){
+    for(int i = 0; i < n*dim; ++i){
       fscanf(l, "%lf", &locs[i]); 
     }
     
-    for(int i = 0; i < (100*100*81); ++i){
+    for(int i = 0; i < n*m; ++i){
       fscanf(nn, "%d", &NNarray[i]);
     }
 
@@ -37,10 +45,6 @@ int main(){
 
     double ll = 0.0;
     double covparms[4] = {4,0.1,0.5,0.1};
-    int n = 100*100;
-    int dim  = 2;
-    int p = 3;
-    int m = 81;
     int n_cores = 4;
    
    
@@ -60,12 +64,10 @@ int main(){
   
    double t2 = omp_get_wtime();
 
-
-//   double t3 = omp_get_wtime();
-//   int mb = n*(n+1)/2;
-//   double* covmat   = (double*) malloc(mb*sizeof(double));
-//   exponential_isotropic(covmat, m, covparms, locs, dim);
-//   double t4 = omp_get_wtime();
+   free(y);
+   free(locs);
+   free(NNarray);
+   free(X);
 
    printf("likelihood:%lf\nlikelihood time:%lf\n", ll, t2-t1);
    

@@ -14,11 +14,11 @@ void chol(double*  a,
   
   
 void solve(double* a, 
-             double*  b, 
-             int      n){
+           double*  b, 
+           int      n){
   
         
-    LAPACKE_dtrtrs(LAPACK_COL_MAJOR,'L', 'N', 'N', n, 1, a,n, b, n);
+   LAPACKE_dtrtrs(LAPACK_COL_MAJOR,'L', 'N', 'N', n, 1, a,n, b, n);
 
 }
 
@@ -27,7 +27,7 @@ void solve_t(double* a,
              int      n){
   
         
-    LAPACKE_dtrtrs(LAPACK_COL_MAJOR,'L', 'T', 'N', n, 1, a,n, b, n);
+   LAPACKE_dtrtrs(LAPACK_COL_MAJOR,'L', 'T', 'N', n, 1, a,n, b, n);
 
 }
 

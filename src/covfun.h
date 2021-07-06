@@ -2,20 +2,6 @@
 #define COVFUN_H
 
 #include <math.h>
-/*double distance(double*  locsub, 
-                 int     j, 
-                 int     i, 
-                 int     dim, 
-                 int     bsize){
-    
-    double t = 0.0;
-    for(int k = 0; k < dim; ++k){
-        t += ((locsub[j*dim + k] - locsub[i*dim + k]) * (locsub[j*dim+ k] - locsub[i*dim + k])) ; 
-    }
-
-    t = sqrt(t);
-    return( t );
-}*/
  
 void exponential_isotropic(double*  covmat,
                            int      bsize,
@@ -31,8 +17,8 @@ void exponential_isotropic(double*  covmat,
     for(int i = (j+1); i < bsize; ++i){
       double d = 0.0;
       for(int k = 0; k < dim; ++k){
-        d += (locsub[k*bsize + j] - locsub[k*bsize + i]) * (locsub[k*bsize + j] - locsub[k*bsize + i]) ;       
-        }      
+        d += ((locsub[k*bsize + j] - locsub[k*bsize + i]) * (locsub[k*bsize + j] - locsub[k*bsize + i])) ;       
+      }      
       covmat[j*bsize + i] = c0*exp(-d/c1);
     }
   }

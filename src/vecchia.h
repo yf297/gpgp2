@@ -17,8 +17,8 @@ void vecchia_likelihood(double*  ll,
                         double*  locs,
                         double*  X,
                         int      n,
-                        int      p,
                         int      dim,
+                        int      p,
                         int*     NNarray,
                         int      m,
                         int      ncores){
@@ -44,14 +44,13 @@ void vecchia_likelihood(double*  ll,
       exponential_isotropic(covmat, bsize, covparms, locsub, dim);
 
       chol(covmat, bsize);
-      double* Li = (double*) malloc(bsize*sizeof(double));
-      Li[bsize-1] = 1.0;
+//      double* Li = (double*) malloc(bsize*sizeof(double));
+//      Li[bsize-1] = 1.0;
 
-      solve_t(covmat, Li, bsize);
+      //solve_t(covmat, Li, bsize);
       solve(covmat, ysub, bsize);
-      
-      
-      int ii = (bsize-1)*(bsize) + bsize-1;      
+            
+      int ii = (bsize-1)*(bsize) + (bsize-1);      
       ySy += pow( ysub[(bsize-1)], 2);
       logdet += 2*log(covmat[ii]);
     }
